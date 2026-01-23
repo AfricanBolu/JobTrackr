@@ -1,0 +1,10 @@
+{
+	"files": [],
+	"references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
+	"compilerOptions": {
+		"target": "es6",
+		"types": ["chrome"],
+		"forceConsistentCasingInFileNames": true,
+		"strict": true
+	}
+}

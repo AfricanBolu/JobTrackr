@@ -1,0 +1,14 @@
+/** @format */
+
+:root {
+    /* Colors */
+    --color-text: #fff;
+    --color-primary: #576cbc;
+    --color-secondary: #19376d;
+    --color-dark: #0b2447;
+    --color-bg: rgb(1, 13, 36);
+
+    /* Fonts */
+    --font-roboto: 'Roboto';
+    --font-outfit: 'Outfit';
+}
