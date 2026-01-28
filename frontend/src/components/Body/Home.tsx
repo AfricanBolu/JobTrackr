@@ -156,23 +156,29 @@ const Home = ({ theme }: SettingsProps) => {
     if (isLoading) return <div>Loading...</div>
     return (
         <>
-            <div className="p-3 flex flex-col gap-4 max-h-screen overflow-y-auto">
-                <Stats
-                    stats={stats}
-                    theme={theme}
-                />
-                <ApplicationsCard
-                    applications={applications}
-                    theme={theme}
-                    onDelete={deleteApplication}
-                    onStatusChange={updateStatus}
-                    onEdit={app => setIsEdit(app)}
-                />
-                <ManualEntry
-                    onOpen={() => setShowManualEntry(true)}
-                    onAdd={addApplication}
-                    theme={theme}
-                />
+            <div className="h-full flex flex-col p-4 gap-3">
+                <div className="shrink-0">
+                    <Stats
+                        stats={stats}
+                        theme={theme}
+                    />
+                </div>
+                <div className="flex-1 min-h-0">
+                    <ApplicationsCard
+                        applications={applications}
+                        theme={theme}
+                        onDelete={deleteApplication}
+                        onStatusChange={updateStatus}
+                        onEdit={app => setIsEdit(app)}
+                    />
+                </div>
+                <div className="shrink-0">
+                    <ManualEntry
+                        onOpen={() => setShowManualEntry(true)}
+                        onAdd={addApplication}
+                        theme={theme}
+                    />
+                </div>
             </div>
 
             {/* Modal iverlay for edit form */}

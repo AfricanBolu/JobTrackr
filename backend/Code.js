@@ -58,7 +58,7 @@ function checkHeader(spreadsheetId) {
 	const matches = COLS.every((c, i) => headerStr[i] === c);
 	if (!matches) {
 		throw new Error(
-			`Header mismatch. Expected:\n${COLS.join(", ")}\nGot:\n${headerStr.join(", ")}`
+			`Header mismatch. Expected:\n${COLS.join(", ")}\nGot:\n${headerStr.join(", ")}`,
 		);
 	}
 }
@@ -106,38 +106,48 @@ function addToSheet(spreadsheetId, app) {
 
 	if (!app || !app.id) throw new Error("app must be an object with an id");
 
-	const sheet = getSheetsTable(spreadsheetId); // get sheet
+	try {
+		const sheet = getSheetsTable(spreadsheetId); // get sheet
 
-	const exist = findRowById(spreadsheetId, app.id); // check if id of application alr exits
-	if (exist !== -1)
-		throw new Error(`Duplicate id "${app.id}" already exists at row ${exist}`); // if so throw an error
+		const exist = findRowById(spreadsheetId, app.id); // check if id of application alr exits
+		if (exist !== -1)
+			throw new Error(`Duplicate id "${app.id}" already exists at row ${exist}`); // if so throw an error
 
-	const rowArray = applicationToRow(app); // map each value in app object to COLS
-	Logger.log("Writing to spreadsheet: " + sheet.getParent().getId());
-	Logger.log("Writing to tab: " + sheet.getName());
+		const rowArray = applicationToRow(app); // map each value in app object to COLS
+		Logger.log("Writing to spreadsheet: " + sheet.getParent().getId());
+		Logger.log("Writing to tab: " + sheet.getName());
 
-	sheet.appendRow(rowArray); // add map to the sheets
+		sheet.appendRow(rowArray); // add map to the sheets
 
-	Logger.log(`Added application ID ${app.id}`);
-	return true;
+		Logger.log(`Added application ID ${app.id}`);
+		return true;
+	} catch (e) {
+		Logger.log(e);
+		return false;
+	}
 }
 
 function rowToDelete(spreadsheetId, id) {
 	checkHeader(spreadsheetId); // check if header is fine, meaning has all req. fields
 
-	const sheet = getSheetsTable(spreadsheetId); // load data
-	const row = findRowById(spreadsheetId, id); // find row with id
+	try {
+		const sheet = getSheetsTable(spreadsheetId); // load data
+		const row = findRowById(spreadsheetId, id); // find row with id
 
-	if (row === -1) {
-		// check if row exists
-		Logger.log("Row not found for ID: " + id);
+		if (row === -1) {
+			// check if row exists
+			Logger.log("Row not found for ID: " + id);
+			return false;
+		}
+
+		sheet.deleteRow(row); // delete the row at the id
+		Logger.log("Row " + row + " has been deleted for ID: " + id);
+
+		return true;
+	} catch (e) {
+		Logger.log(e);
 		return false;
 	}
-
-	sheet.deleteRow(row); // delete the row at the id
-	Logger.log("Row " + row + " has been deleted for ID: " + id);
-
-	return true;
 }
 
 // upddates value one at a time
@@ -145,39 +155,45 @@ function rowToDelete(spreadsheetId, id) {
 function updateRow(spreadsheetId, id, updates) {
 	checkHeader(spreadsheetId); // check if header is fine, meaning has all req. fields
 
-	const sheet = getSheetsTable(spreadsheetId); // load data
-	const row = findRowById(spreadsheetId, id); // find the id of the row
+	try {
+		const sheet = getSheetsTable(spreadsheetId); // load data
+		const row = findRowById(spreadsheetId, id); // find the id of the row
 
-	if (row === -1) {
-		// check if row exists
-		Logger.log("Row not found for ID: " + id);
+		if (row === -1) {
+			// check if row exists
+			Logger.log("Row not found for ID: " + id);
+			return false;
+		}
+
+		if (!updates || typeof updates !== "object" || Array.isArray(updates))
+			// check if updates is an object
+			throw new Error("updates must be an object like { jobStatus: 'interview' }");
+
+		const colMap = headerIndexMap(spreadsheetId); // create column map for faster search
+
+		//strict validation: reject unknown keys
+		const keys = Object.keys(updates);
+		for (const k of keys) {
+			if (!colMap[k])
+				throw new Error(`Unknown column "${k}". Allowed: ${COLS.join(", ")}`);
+
+			if (k === "id") throw new Error('Updating "id" is not allowed');
+		}
+
+		// Batch write: one getRange + setValues for only the columns being updated
+		// We write cell-by-cell only for the keys provided (still small & safe).
+		for (const k of keys) {
+			const col = colMap[k];
+			sheet.getRange(row, col).setValue(updates[k]);
+		}
+
+		Logger.log(`Updated ID ${id}: ${JSON.stringify(updates)}`);
+
+		return true;
+	} catch (e) {
+		Logger.log(e);
 		return false;
 	}
-
-	if (!updates || typeof updates !== "object" || Array.isArray(updates))
-		// check if updates is an object
-		throw new Error("updates must be an object like { jobStatus: 'interview' }");
-
-	const colMap = headerIndexMap(spreadsheetId); // create column map for faster search
-
-	//strict validation: reject unknown keys
-	const keys = Object.keys(updates);
-	for (const k of keys) {
-		if (!colMap[k]) throw new Error(`Unknown column "${k}". Allowed: ${COLS.join(", ")}`);
-
-		if (k === "id") throw new Error('Updating "id" is not allowed');
-	}
-
-	// Batch write: one getRange + setValues for only the columns being updated
-	// We write cell-by-cell only for the keys provided (still small & safe).
-	for (const k of keys) {
-		const col = colMap[k];
-		sheet.getRange(row, col).setValue(updates[k]);
-	}
-
-	Logger.log(`Updated ID ${id}: ${JSON.stringify(updates)}`);
-
-	return true;
 }
 
 // used to replace multiple entries
@@ -187,39 +203,49 @@ function replaceRowColumnValue(spreadsheetId, app) {
 
 	if (!app || !app.id) throw new Error("app must be an object with an id");
 
-	const sheet = getSheetsTable(spreadsheetId); // load data
-	const row = findRowById(spreadsheetId, app.id); // find the id of the row
+	try {
+		const sheet = getSheetsTable(spreadsheetId); // load data
+		const row = findRowById(spreadsheetId, app.id); // find the id of the row
 
-	if (row === -1) {
-		// check if row exists
-		Logger.log("Row not found for ID: " + id);
+		if (row === -1) {
+			// check if row exists
+			Logger.log("Row not found for ID: " + id);
+			return false;
+		}
+
+		const rowArray = applicationToRow(app); // conversion of object data to map the values to each column
+		sheet.getRange(row, 1, 1, COLS.length).setValues([rowArray]);
+
+		Logger.log(`Replaced row for ID ${app.id}`);
+		return true;
+	} catch (e) {
+		Logger.log(e);
 		return false;
 	}
-
-	const rowArray = applicationToRow(app); // conversion of object data to map the values to each column
-	sheet.getRange(row, 1, 1, COLS.length).setValues([rowArray]);
-
-	Logger.log(`Replaced row for ID ${app.id}`);
-	return true;
 }
 
 function readSheetData(spreadsheetId) {
 	checkHeader(spreadsheetId); // check if header is fine, meaning has all req. fields
-	const sheet = getSheetsTable; // load data
-	const lastRow = sheet.getLastRow(); // get the lastrow with data
+	try {
+		const sheet = getSheetsTable(spreadsheetId); // load data
+		const lastRow = sheet.getLastRow(); // get the lastrow with data
 
-	if (lastRow < 2) return []; // check if has more that just header (row 1 = header, row 2+ = data)
+		if (lastRow < 2) return []; // check if has more that just header (row 1 = header, row 2+ = data)
 
-	const data = sheet.getRange(2, 1, lastRow - 1, COLS.length).getValues(); // get all data in sheet
+		const data = sheet.getRange(2, 1, lastRow - 1, COLS.length).getValues(); // get all data in sheet
 
-	return data.map((row) => {
-		const obj = {};
-		COLS.forEach((col, i) => {
-			obj[col] = row[i];
+		return data.map((row) => {
+			const obj = {};
+			COLS.forEach((col, i) => {
+				obj[col] = row[i];
+			});
+
+			// add syncStatus since its coming from the sheet
+			obj.syncStatus = "synced"; // add syncStatus
+			return obj;
 		});
-
-		// add syncStatus since its coming from the sheet
-		obj.syncStatus = "synced"; // add syncStatus
-		return obj;
-	});
+	} catch (e) {
+		Logger.log(e);
+		return [];
+	}
 }
