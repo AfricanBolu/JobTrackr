@@ -11,6 +11,7 @@ export const STORAGE_KEYS = {
 
 	// large data
 	applications: "applications",
+	detectedJobs: "detectedJobs",
 } as const;
 
 // ---- Defaults ----
@@ -96,6 +97,20 @@ function isApplicationArray(v: unknown): v is Application[] {
 	return Array.isArray(v);
 }
 
+function isADetectedJob(v: unknown): v is Application | null {
+    // If it's null, that's valid (no job detected)
+    if (v === null) return true;
+    
+    // If it's not an object, it's invalid
+    if (typeof v !== 'object' || v === null) return false;
+    
+    // Check if it has the required Application fields
+    // At minimum, check for 'id' field
+    const hasId = 'id' in v;
+    
+    return hasId;
+}
+
 // ---- Public API: Preferences (sync) ----
 export async function loadTheme(): Promise<Theme> {
 	// loads theme from chrome storage
@@ -150,3 +165,17 @@ export async function saveApplications(apps: Application[]): Promise<void> {
 	// saves applications to chrome storage
 	await setLocal(STORAGE_KEYS.applications, apps);
 }
+
+export async function loadDetectedJobs(): Promise<Application | null> {
+	// loads applications from chrome storage
+	// check if applications is valid
+	// if not, return empty
+	// uses chrome local storage cause total applications can get very big
+	const v = await getLocal<unknown>(STORAGE_KEYS.detectedJobs);
+	return isADetectedJob(v) ? v : null;
+} 
+
+export async function saveDetectedJobs(apps: Application[]): Promise<void> {
+	// saves applications to chrome storage
+	await setLocal(STORAGE_KEYS.detectedJobs, apps);
+}							

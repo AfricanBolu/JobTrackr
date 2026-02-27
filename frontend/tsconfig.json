@@ -2,6 +2,7 @@
 	"files": [],
 	"references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
 	"compilerOptions": {
+		"lib": ["DOM", "ES2022"],
 		"target": "es6",
 		"types": ["chrome"],
 		"forceConsistentCasingInFileNames": true,
