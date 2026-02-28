@@ -1,7 +1,7 @@
 import type { PopupProps } from "../../../types";
 
 
-const JobConfirmationCard = ({ detectedJob, theme, onConfirm, onEdit, onDismiss }: PopupProps) => {
+const PopUpCard = ({ detectedJob, theme, onConfirm, onEdit, onDismiss }: PopupProps) => {
     const cardTheme = theme === "darkmode"
         ? "bg-slate-800 border-slate-700"
         : "bg-white border-gray-200 shadow-lg";
@@ -96,4 +96,4 @@ const JobConfirmationCard = ({ detectedJob, theme, onConfirm, onEdit, onDismiss 
     );
 };
 
-export default JobConfirmationCard;
+export default PopUpCard;

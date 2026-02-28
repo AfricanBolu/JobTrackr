@@ -10,7 +10,7 @@
 	"permissions": ["storage"],
 	"content_scripts": [
 		{
-			"matches": ["https://linkedin.com/*", "https://indeed.com/*"],
+			"matches": ["*://*.linkedin.com/*", "*://*.indeed.com/*"],
 			"js": ["content.js"],
 			"run_at": "document_end"
 		}

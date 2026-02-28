@@ -2,6 +2,7 @@
 
 const url = new URL(window.location.href);
 
+// Linkedin Job posting
 if (url.hostname.includes("linkedin.com")) {
 	// Install the interceptor first
 	const originalPushState = history.pushState;
@@ -34,21 +35,28 @@ if (url.hostname.includes("linkedin.com")) {
 		const salaryContainer = document.querySelector(".job-details-fit-level-preferences");
 
 		return {
-			jobId,
-			url,
-			title: document
-				.querySelector(".job-details-jobs-unified-top-card__company-name")
-				?.textContent?.trim(),
-			company: document
-				.querySelector(".job-details-jobs-unified-top-card__job-title")
-				?.textContent?.trim(),
+			id: jobId, // Changed to match "id" check in storage.ts
+			jobId: jobId,
+			appliedFromUrl: url.toString(), // Mapped properly
+			companyName:
+				document // Selectors swapped to correct targets
+					.querySelector(".job-details-jobs-unified-top-card__company-name")
+					?.textContent?.trim() || "",
+			jobTitle:
+				document
+					.querySelector(".job-details-jobs-unified-top-card__job-title")
+					?.textContent?.trim() || "",
 			location: (
 				locationContainer?.querySelector("span > span") as HTMLElement
 			)?.innerText.trim(),
 			salary: (
 				salaryContainer?.querySelector("span > strong") as HTMLElement
 			)?.innerText.trim(),
-			websiteName: "LinkedIn",
+			appliedFromName: "LinkedIn", // Mapped properly
+			// Default required Application fields
+			dateApplied: new Date().toISOString(),
+			jobStatus: "applied",
+			syncStatus: "pending",
 		};
 	}
 	const jobData = getJobData();
@@ -57,6 +65,7 @@ if (url.hostname.includes("linkedin.com")) {
 	}
 }
 
+// Indeed Job posting
 if (url.hostname.includes("indeed.com")) {
 	// Install the interceptor first
 	const originalPushState = history.pushState;
@@ -99,17 +108,19 @@ if (url.hostname.includes("indeed.com")) {
 
 		// return job data extracted to pass into storage
 		return {
-			jobId,
-			url,
-			title: document.querySelector("h1>span")?.textContent,
-			company: document.querySelector('[data-company-name="true"]')?.textContent?.trim(),
-			location: document.querySelector("[data-testid=job-location]")?.textContent.trim(),
-			// salary:
-			// 	jobType === "Full-time"
-			// 		? salaryContainer?.textContent?.trim().replace(/\s+a year$/i, "")
-			// 		: salaryContainer?.textContent?.trim().match(/\d+/)?.[0],
+			id: jobId, // Changed to match "id" check
+			jobId: jobId,
+			appliedFromUrl: url.toString(), // Mapped properly
+			jobTitle: document.querySelector("h1>span")?.textContent || "", // Mapped properly
+			companyName:
+				document.querySelector('[data-company-name="true"]')?.textContent?.trim() || "", // Mapped properly
+			location: document.querySelector("[data-testid=job-location]")?.textContent?.trim(),
 			salary: salaryContainer?.textContent?.trim().replace(/^From\s+/i, ""),
-			websiteName: "Indeed",
+			appliedFromName: "Indeed", // Mapped properly
+			// Default required Application fields
+			dateApplied: new Date().toISOString(),
+			jobStatus: "applied",
+			syncStatus: "pending",
 		};
 	}
 	const jobData = getJobData();
