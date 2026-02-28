@@ -44,6 +44,26 @@ const Home = ({ theme }: SettingsProps) => {
     }, [])
 
     useEffect(() => {
+        const onStorageChange = (
+            changes: { [key: string]: chrome.storage.StorageChange },
+            areaName: string
+        ) => {
+            if (areaName !== "local") return;
+
+            if (changes.detectedJob) {
+                const newValue = changes.detectedJob.newValue;
+                setDetectedJob(newValue as Application | null);
+            }
+        };
+
+        chrome.storage.onChanged.addListener(onStorageChange);
+
+        return () => {
+            chrome.storage.onChanged.removeListener(onStorageChange);
+        };
+    }, []);
+
+    useEffect(() => {
         let unmounted = false;
         const load = async () => {
             const apps = await loadApplications();

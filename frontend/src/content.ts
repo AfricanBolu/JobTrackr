@@ -4,65 +4,121 @@ const url = new URL(window.location.href);
 
 // Linkedin Job posting
 if (url.hostname.includes("linkedin.com")) {
-	// Install the interceptor first
-	const originalPushState = history.pushState;
-	history.pushState = function (...args) {
-		// Call original
-		const result = originalPushState.apply(this, args);
+	let lastSeenJobId: string | null = null;
+	let pendingTimer: number | null = null;
 
-		// After URL changes, extract job data
-		setTimeout(() => {
-			const jobData = getJobData();
-			if (jobData) {
-				chrome.storage.local.set({ detectedJob: jobData });
-			}
-		}, 500); // Small delay to let DOM update
+	function getCurrentJobId(): string | null {
+		return new URLSearchParams(window.location.search).get("currentJobId");
+	}
 
-		return result;
-	};
-
-	function getJobData() {
-		function getJobId() {
-			return new URLSearchParams(window.location.search).get("currentJobId");
-		}
-		const jobId = getJobId();
+	function extractLinkedInJobData() {
+		const jobId = getCurrentJobId();
 		if (!jobId) return null;
 
-		const url = new URL(`https://www.linkedin.com/jobs/view/${jobId}`);
+		const titleEl = document.querySelector(
+			".job-details-jobs-unified-top-card__job-title",
+		);
+
+		const companyEl = document.querySelector(
+			".job-details-jobs-unified-top-card__company-name",
+		);
+
+		// Don’t save until core DOM is actually present
+		const jobTitle = titleEl?.textContent?.trim() || "";
+		const companyName = companyEl?.textContent?.trim() || "";
+
+		if (!jobTitle || !companyName) return null;
+
 		const locationContainer = document.querySelector(
 			".job-details-jobs-unified-top-card__primary-description-container",
 		);
+
 		const salaryContainer = document.querySelector(".job-details-fit-level-preferences");
 
+		const canonicalUrl = `https://www.linkedin.com/jobs/view/${jobId}`;
+
 		return {
-			id: jobId, // Changed to match "id" check in storage.ts
-			jobId: jobId,
-			appliedFromUrl: url.toString(), // Mapped properly
-			companyName:
-				document // Selectors swapped to correct targets
-					.querySelector(".job-details-jobs-unified-top-card__company-name")
-					?.textContent?.trim() || "",
-			jobTitle:
-				document
-					.querySelector(".job-details-jobs-unified-top-card__job-title")
-					?.textContent?.trim() || "",
-			location: (
-				locationContainer?.querySelector("span > span") as HTMLElement
-			)?.innerText.trim(),
-			salary: (
-				salaryContainer?.querySelector("span > strong") as HTMLElement
-			)?.innerText.trim(),
-			appliedFromName: "LinkedIn", // Mapped properly
-			// Default required Application fields
+			id: jobId,
+			jobId,
+			jobTitle,
+			companyName,
+			appliedFromUrl: canonicalUrl,
+			appliedFromName: "LinkedIn",
+			location:
+				(
+					locationContainer?.querySelector("span > span") as HTMLElement
+				)?.innerText?.trim() || "",
+			salary:
+				(
+					salaryContainer?.querySelector("span > strong") as HTMLElement
+				)?.innerText?.trim() || "",
 			dateApplied: new Date().toISOString(),
 			jobStatus: "applied",
 			syncStatus: "pending",
 		};
 	}
-	const jobData = getJobData();
-	if (jobData) {
+
+	function saveIfNewJob() {
+		const currentJobId = getCurrentJobId();
+		if (!currentJobId) return;
+
+		// If same job id, still allow a retry in case DOM wasn’t ready before
+		const jobData = extractLinkedInJobData();
+		if (!jobData) return;
+
+		// Prevent redundant writes once it succeeds
+		if (lastSeenJobId === currentJobId) return;
+
+		lastSeenJobId = currentJobId;
 		chrome.storage.local.set({ detectedJob: jobData });
+		console.log("Saved detected LinkedIn job:", jobData);
 	}
+
+	function scheduleCheck() {
+		if (pendingTimer) window.clearTimeout(pendingTimer);
+
+		// Give LinkedIn time to render the right pane
+		pendingTimer = window.setTimeout(() => {
+			saveIfNewJob();
+		}, 900);
+	}
+
+	function patchHistoryMethod(method: "pushState" | "replaceState") {
+		const original = history[method];
+
+		history[method] = function (
+			this: History,
+			...args: Parameters<History[typeof method]>
+		) {
+			const result = original.apply(this, args);
+			scheduleCheck();
+			return result;
+		} as History[typeof method];
+	}
+
+	patchHistoryMethod("pushState");
+	patchHistoryMethod("replaceState");
+
+	window.addEventListener("popstate", scheduleCheck);
+
+	// Observe DOM changes because LinkedIn may update pane without a clean history event
+	const observer = new MutationObserver(() => {
+		const currentJobId = getCurrentJobId();
+		if (!currentJobId) return;
+
+		// Only care if the selected job may have changed
+		if (currentJobId !== lastSeenJobId) {
+			scheduleCheck();
+		}
+	});
+
+	observer.observe(document.body, {
+		childList: true,
+		subtree: true,
+	});
+
+	// Initial attempt on page load
+	scheduleCheck();
 }
 
 // Indeed Job posting

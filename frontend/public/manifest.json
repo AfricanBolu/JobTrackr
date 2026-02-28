@@ -10,7 +10,12 @@
 	"permissions": ["storage"],
 	"content_scripts": [
 		{
-			"matches": ["*://*.linkedin.com/*", "*://*.indeed.com/*"],
+			"matches": [
+				"*://*.linkedin.com/*",
+				"*://*.indeed.com/*",
+				"*://*.glassdoor.com/*",
+				"*://*.handshake.com/*"
+			],
 			"js": ["content.js"],
 			"run_at": "document_end"
 		}
