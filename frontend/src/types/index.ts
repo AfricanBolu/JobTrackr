@@ -77,3 +77,11 @@ export type NavProps = {
 	showSettings: boolean;
 	theme: Theme;
 };
+
+export interface PopupProps {
+	detectedJob: Application;
+	theme: Theme;
+	onConfirm: () => void;
+	onEdit: () => void;
+	onDismiss: () => void;
+}

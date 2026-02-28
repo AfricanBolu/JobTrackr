@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 
 import type { Application, SettingsProps, ApplicationStatus } from "../../types";
-import { loadApplications, saveApplications } from "../../lib/storage";
+import { loadApplications, saveApplications, loadDetectedJob, saveDetectedJob } from "../../lib/storage";
 
 import Stats from "./Home/Stats"
 import ApplicationsCard from "./Home/ApplicationsCard";
 import ManualEntry from "./Home/ManualEntry";
 import Form from "./Home/Form";
+import PopUp from "./Home/PopUp";
 
 const Home = ({ theme }: SettingsProps) => {
     const [applications, setApplications] = useState<Application[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isEdit, setIsEdit] = useState<Application | null>(null)
     const [showManualEntry, setShowManualEntry] = useState(false);
+    const [detectedJob, setDetectedJob] = useState<Application | null>(null);
 
     const stats = {
         totalApplications: applications.length,
@@ -23,6 +25,23 @@ const Home = ({ theme }: SettingsProps) => {
         }).length,
         interviews: applications.filter(app => app.jobStatus === "interview").length,
     };
+
+    useEffect(() => {
+        let unmounted = false;
+
+        const checkForDetectedJob = async () => {
+            const job = await loadDetectedJob();
+            if (!unmounted && job) {
+                setDetectedJob(job);
+            }
+        };
+
+        checkForDetectedJob();
+
+        return () => {
+            unmounted = true;
+        };
+    }, [])
 
     useEffect(() => {
         let unmounted = false;
@@ -149,6 +168,34 @@ const Home = ({ theme }: SettingsProps) => {
         return rest;
     }
 
+    const handleConfirmDetectedJob = () => {
+        if (!detectedJob) return;
+
+        // Add to applications
+        addApplication(detectedJob);
+
+        // Clear detected job from storage
+        saveDetectedJob(null);
+        setDetectedJob(null);
+    };
+
+    const handleEditDetectedJob = () => {
+        if (!detectedJob) return;
+
+        // Open edit form with detected job data
+        setIsEdit(detectedJob);
+
+        // Clear detected job
+        saveDetectedJob(null);
+        setDetectedJob(null);
+    };
+
+    const handleDismissDetectedJob = () => {
+        // Clear detected job
+        saveDetectedJob(null);
+        setDetectedJob(null);
+    };
+
     const bgOverlay = theme === "darkmode"
         ? "bg-black/50"
         : "bg-black/30";
@@ -157,6 +204,19 @@ const Home = ({ theme }: SettingsProps) => {
     return (
         <>
             <div className="h-full flex flex-col p-4 gap-3">
+                {/* Show confirmation card if job detected */}
+                {detectedJob && (
+                    <div className="shrink-0">
+                        <PopUp
+                            detectedJob={detectedJob}
+                            theme={theme}
+                            onConfirm={handleConfirmDetectedJob}
+                            onEdit={handleEditDetectedJob}
+                            onDismiss={handleDismissDetectedJob}
+                        />
+                    </div>
+                )}
+
                 <div className="shrink-0">
                     <Stats
                         stats={stats}
