@@ -41,20 +41,20 @@ const PopUpCard = ({ detectedJob, theme, onConfirm, onEdit, onDismiss }: PopupPr
             <div className="p-4 space-y-3">
                 {/* Title & Company */}
                 <div>
-                    <h4 className="font-bold text-lg">{detectedJob.jobTitle}</h4>
-                    <p className={`text-sm ${textTheme}`}>{detectedJob.companyName}</p>
+                    <h4 className="font-bold text-lg">{detectedJob?.jobTitle}</h4>
+                    <p className={`text-sm ${textTheme}`}>{detectedJob?.companyName}</p>
                 </div>
 
                 {/* Details grid */}
                 <div className="space-y-2 text-sm">
-                    {detectedJob.location && (
+                    {detectedJob?.location && (
                         <div className="flex items-start gap-2">
                             <span className={`text-xs font-medium ${labelTheme} w-20 shrink-0`}>Location:</span>
                             <span className="flex-1">{detectedJob.location}</span>
                         </div>
                     )}
 
-                    {detectedJob.salary && (
+                    {detectedJob?.salary && (
                         <div className="flex items-start gap-2">
                             <span className={`text-xs font-medium ${labelTheme} w-20 shrink-0`}>Salary:</span>
                             <span className="flex-1">{detectedJob.salary}</span>
@@ -63,7 +63,7 @@ const PopUpCard = ({ detectedJob, theme, onConfirm, onEdit, onDismiss }: PopupPr
 
                     <div className="flex items-start gap-2">
                         <span className={`text-xs font-medium ${labelTheme} w-20 shrink-0`}>Source:</span>
-                        <span className="flex-1">{detectedJob.appliedFromName}</span>
+                        <span className="flex-1">{detectedJob?.appliedFromName}</span>
                     </div>
                 </div>
             </div>

@@ -79,7 +79,7 @@ export type NavProps = {
 };
 
 export interface PopupProps {
-	detectedJob: Application;
+	detectedJob: Application | null;
 	theme: Theme;
 	onConfirm: () => void;
 	onEdit: () => void;
