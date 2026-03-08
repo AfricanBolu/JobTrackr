@@ -25,3 +25,7 @@ dist-ssr
 
 # Package-lock.json
 package-lock.json/
+
+
+# editor beautify
+.prettierrc
