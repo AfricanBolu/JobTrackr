@@ -225,6 +225,10 @@ const Home = ({ theme }: SettingsProps) => {
     return (
         <>
             <div className="h-full flex flex-col p-4 gap-3">
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6120ddcc4782d941c76ade91d06e9dbaddfe4fb3
                 <div className="shrink-0">
                     <Stats
                         stats={stats}
@@ -249,7 +253,7 @@ const Home = ({ theme }: SettingsProps) => {
                 </div>
             </div>
 
-            {/* Modal iverlay for edit form */}
+            {/* Modal overlay for edit form */}
             {isEdit && (
                 <div
                     className={`fixed inset-0 ${bgOverlay} flex items-center justify-center z-50 p-4`}
@@ -269,6 +273,7 @@ const Home = ({ theme }: SettingsProps) => {
                 </div>
             )}
 
+<<<<<<< HEAD
 
             {/* Show confirmation card if job detected */}
             {detectedJob && (
@@ -291,6 +296,21 @@ const Home = ({ theme }: SettingsProps) => {
                     onDismiss={handleDismissDetectedJob}
                 />
             </div> */}
+=======
+            {/* Show confirmation card if job detected */}
+            {detectedJob && (
+                    <div className="shrink-0">
+                        <PopUp
+                            detectedJob={detectedJob}
+                            theme={theme}
+                            onConfirm={handleConfirmDetectedJob}
+                            onEdit={handleEditDetectedJob}
+                            onDismiss={handleDismissDetectedJob}
+                        />
+                    </div>
+                )}
+
+>>>>>>> 6120ddcc4782d941c76ade91d06e9dbaddfe4fb3
             {/* Modal Overlay for Manual Entry Form */}
             {showManualEntry && (
                 <div

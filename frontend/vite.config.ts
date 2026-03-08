@@ -15,12 +15,14 @@ export default defineConfig({
 				index: "index.html",
 				sw: "src/background.ts",
 				content: "src/content.ts",
+				inject: "src/inject.ts",
 			},
 			output: {
 				entryFileNames: (chunk) => {
 					// 2. Ensure both sw and content don't get hashes
 					if (chunk.name === "sw") return "background.js";
 					if (chunk.name === "content") return "content.js";
+					if (chunk.name === "inject") return "inject.js";
 					return "assets/[name]-[hash].js";
 				},
 				assetFileNames: "assets/[name]-[hash][extname]",
