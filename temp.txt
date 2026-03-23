@@ -1,0 +1,25 @@
+"jobview": {
+            "header": {
+                "easyApply": false,
+                
+                "employerNameFromSearch": "DataAnnotation",
+            
+                
+                "jobTitleText": "Full Stack Developer - AI Trainer",
+                
+                "jobType": [
+                    "Contract"
+                ],
+
+                "locationName": "Jacksonville, FL",
+                
+                "payCurrency": "USD",
+                "payPeriod": "HOURLY",
+                "payPeriodAdjustedPay": {
+                    "p10": 40,
+                    "p50": 40,
+                    "p90": 40
+                },
+                
+            }
+        },

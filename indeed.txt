@@ -1,0 +1,23 @@
+"jobInfoWrapperModel": {
+            "jobInfoModel": {
+                "jobInfoHeaderModel": {
+                    "companyName": "Wash Masters Car Wash",
+                    
+                    "formattedLocation": "Waxahachie, TX 75165",
+                    
+                    "jobTitle": "Software Engineer & IT Technician - 3YR EXP Minimum",
+                    
+                },
+                "jobMetadataHeaderModel": {
+                    "jobType": "Full-time"
+                },
+                "jobTagModel": null,
+                "resumeEvaluationResult": null,
+                "sanitizedJobDescription": "<p><b>POS Systems &amp; IT Engineer Engineer</b></p>\n<p><b>Company: Wash Masters Car Wash | Waxahachie, TX</b></p>\n<p><b>About Us</b></p>\n<p>Wash Masters is one of the fastest-growing car wash chains in Dallas-Fort Worth. We're upgrading our point-of-sale infrastructure and building customer-facing mobile technology, and we need someone who can own both efforts.</p>\n<p><b>The Role</b></p>\n<p>You'll serve as our internal technical lead overseeing the implementation of a new POS system (being developed by a third-party vendor) while also leading development of our mobile app and other customer-facing features. You'll be based in Waxahachie, TX with regular travel to our DFW locations.</p>\n<p><b>What You'll Do</b></p>\n<ul>\n <li>Serve as the primary liaison with our POS vendor — managing timelines, testing, and rollout across locations</li>\n <li>Lead development of a customer-facing mobile app and related digital tools</li>\n <li>Troubleshoot software and hardware issues in the field and remotely</li>\n <li>Coordinate on-site installations and system go-lives at our car wash locations</li>\n <li>Document processes and train staff on new systems</li>\n</ul>\n<p><b>What We're Looking For</b></p>\n<ul>\n <li>2+ years of software development experience (mobile or web)</li>\n <li>Hands-on field experience with hardware deployments or IT installations</li>\n <li>Strong project management and vendor communication skills</li>\n <li>Self-starter comfortable working across technical and operational teams</li>\n <li>Valid driver's license — regular travel within DFW required</li>\n</ul>\n<p><b>Nice to Have</b></p>\n<ul>\n <li>Experience with POS platforms in retail, hospitality, or car wash</li>\n <li>Familiarity with membership or subscription billing systems</li>\n</ul>\n<p>Job Type: Full-time</p>\n<p>Pay: From $70,000.00 per year</p>\n<p>Benefits:</p>\n<ul>\n <li>401(k) matching</li>\n <li>Dental insurance</li>\n <li>Disability insurance</li>\n <li>Health insurance</li>\n <li>Life insurance</li>\n <li>Vision insurance</li>\n</ul>\n<p>Application Question(s):</p>\n<ul>\n <li>Candidates will be expected to take a technological screening test to test their programming ability and experience.</li>\n</ul>\n<p>Work Location: In person</p>",
+                "showExpiredHeader": false,
+                "structuredDataJobSummaryModel": null,
+                "tagModels": null,
+                "viewJobDisplay": "DESKTOP_EMBEDDED"
+            },
+            "sectionedJobInfoModel": null
+        },
