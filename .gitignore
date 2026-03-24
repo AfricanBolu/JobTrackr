@@ -29,3 +29,6 @@ package-lock.json/
 
 # editor beautify
 .prettierrc
+
+indeed.txt
+temp.txt
