@@ -271,16 +271,21 @@ const Home = ({ theme }: SettingsProps) => {
 
             {/* Show confirmation card if job detected */}
             {detectedJob && (
-                <div className="shrink-0">
-                    <PopUp
-                        detectedJob={detectedJob}
-                        theme={theme}
-                        onConfirm={handleConfirmDetectedJob}
-                        onEdit={handleEditDetectedJob}
-                        onDismiss={handleDismissDetectedJob}
-                    />
-                </div>
-            )}
+    <div
+        className={`fixed inset-0 ${bgOverlay} flex items-end justify-center z-50 p-4`}
+        onClick={handleDismissDetectedJob}
+    >
+        <div className="w-full" onClick={(e) => e.stopPropagation()}>
+            <PopUp
+                detectedJob={detectedJob}
+                theme={theme}
+                onConfirm={handleConfirmDetectedJob}
+                onEdit={handleEditDetectedJob}
+                onDismiss={handleDismissDetectedJob}
+            />
+        </div>
+    </div>
+)}
 
             {/* Modal Overlay for Manual Entry Form */}
             {showManualEntry && (

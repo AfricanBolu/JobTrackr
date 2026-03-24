@@ -1,5 +1,4 @@
 /** @format */
-import {nanoid} from 'nanoid'
 
 const url = new URL(window.location.href)
 
@@ -133,7 +132,10 @@ const url = new URL(window.location.href)
 // }
 
 if(url.hostname.includes('indeed.com')) {
-	console.log("Injecting interceptor from content script...")
+	// const id = ;
+	// console.log(id);
+
+	// console.log("Injecting interceptor from content script...")
 
 	const script = document.createElement('script')
 	script.src = chrome.runtime.getURL('inject.js')
@@ -160,7 +162,7 @@ if(url.hostname.includes('indeed.com')) {
 			}
 
 			const application = {
-				id: nanoid(),
+				id: crypto.randomUUID(),
 				jobTitle: jobTitle,
 				companyName: companyName,
 				location: location,
