@@ -7,7 +7,7 @@ function doPost(event) {
 		lock.waitLock(10000); // Wait up to 10 seconds for other requests to finish
 	} catch (e) {
 		return ContentService.createTextOutput(
-			JSON.stringify({ status: "error", message: "Server busy" })
+			JSON.stringify({ status: "error", message: "Server busy" }),
 		).setMimeType(ContentService.MimeType.JSON);
 	}
 
@@ -48,6 +48,7 @@ function doPost(event) {
 
 			case "READ":
 				result = readSheetData(spreadsheetId); // call function to read data
+				console.log("READ", result);
 				break;
 
 			default:
@@ -59,7 +60,7 @@ function doPost(event) {
 			JSON.stringify({
 				status: "success",
 				result: result,
-			})
+			}),
 		).setMimeType(ContentService.MimeType.JSON);
 	} catch (e) {
 		//return error
@@ -67,7 +68,7 @@ function doPost(event) {
 			JSON.stringify({
 				status: "error",
 				message: e.toString(),
-			})
+			}),
 		).setMimeType(ContentService.MimeType.JSON);
 	} finally {
 		lock.releaseLock();

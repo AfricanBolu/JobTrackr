@@ -14,7 +14,7 @@ const Nav = ({ settingsClick, showSettings, theme }: NavProps) => {
 
     return (
         <header
-            className={`border-b ${navTheme}`}
+            className={`shrink-0 border-b ${navTheme}`}
         >
             <nav
                 className='flex items-center justify-between px-4 py-3'

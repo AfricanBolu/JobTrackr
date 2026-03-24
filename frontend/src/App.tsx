@@ -37,7 +37,7 @@ function App() {
   return (
     <>
       <div
-        className={`w-full h-full flex flex-col overflow-hidden ${theme === "lightmode" ? "bg-stone-200 text-blue-850" : "bg-indigo-950 text-stone-200"} p-4 `}
+        className={`w-full max-w-md h-full flex flex-col overflow-hidden ${theme === "lightmode" ? "bg-stone-200 text-blue-850" : "bg-indigo-950 text-stone-200"}`}
       >
         <Nav
           showSettings={showSettings}

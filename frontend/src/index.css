@@ -19,8 +19,11 @@
 }
 
 /* EXTENSION FIXED DIMENSIONS */
+html,
 body {
-	width: 360px; /* ← Slimmer width */
+	width: 330px; /* ← Slimmer width */
+	/* min-height: 400px;
+	max-height: 600px; */
 	height: 600px;
 	margin: 0;
 	padding: 0;
@@ -31,6 +34,9 @@ body {
 #root {
 	width: 100%;
 	height: 100%;
+	/* height: 100vh; */
+	display: flex;
+	flex-direction: column;
 	overflow: hidden;
 }
 
@@ -49,4 +55,32 @@ body {
 /* Optional */
 button {
 	font-family: inherit;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
+/* Dark mode scrollbar */
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+	background: #666;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+	background: #888;
 }

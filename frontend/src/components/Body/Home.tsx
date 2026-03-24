@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 
 import type { Application, SettingsProps, ApplicationStatus } from "../../types";
-import { loadApplications, saveApplications } from "../../lib/storage";
+import { loadApplications, saveApplications, loadDetectedJob, saveDetectedJob } from "../../lib/storage";
+// import { loadApplications, saveApplications } from "../../lib/storage";
 
 import Stats from "./Home/Stats"
 import ApplicationsCard from "./Home/ApplicationsCard";
 import ManualEntry from "./Home/ManualEntry";
 import Form from "./Home/Form";
+import PopUp from "./Home/PopUp";
 
 const Home = ({ theme }: SettingsProps) => {
     const [applications, setApplications] = useState<Application[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isEdit, setIsEdit] = useState<Application | null>(null)
     const [showManualEntry, setShowManualEntry] = useState(false);
+    const [detectedJob, setDetectedJob] = useState<Application | null>(null);
 
     const stats = {
         totalApplications: applications.length,
@@ -23,6 +26,43 @@ const Home = ({ theme }: SettingsProps) => {
         }).length,
         interviews: applications.filter(app => app.jobStatus === "interview").length,
     };
+
+    useEffect(() => {
+        let unmounted = false;
+
+        const checkForDetectedJob = async () => {
+            const job = await loadDetectedJob();
+            if (!unmounted && job) {
+                setDetectedJob(job);
+            }
+        };
+
+        checkForDetectedJob();
+
+        return () => {
+            unmounted = true;
+        };
+    }, [])
+
+    useEffect(() => {
+        const onStorageChange = (
+            changes: { [key: string]: chrome.storage.StorageChange },
+            areaName: string
+        ) => {
+            if (areaName !== "local") return;
+
+            if (changes.detectedJob) {
+                const newValue = changes.detectedJob.newValue;
+                setDetectedJob(newValue as Application | null);
+            }
+        };
+
+        chrome.storage.onChanged.addListener(onStorageChange);
+
+        return () => {
+            chrome.storage.onChanged.removeListener(onStorageChange);
+        };
+    }, []);
 
     useEffect(() => {
         let unmounted = false;
@@ -149,6 +189,34 @@ const Home = ({ theme }: SettingsProps) => {
         return rest;
     }
 
+    const handleConfirmDetectedJob = () => {
+        if (!detectedJob) return;
+
+        // Add to applications
+        addApplication(detectedJob);
+
+        // Clear detected job from storage
+        saveDetectedJob(null);
+        setDetectedJob(null);
+    };
+
+    const handleEditDetectedJob = () => {
+        if (!detectedJob) return;
+
+        // Open edit form with detected job data
+        setIsEdit(detectedJob);
+
+        // Clear detected job
+        saveDetectedJob(null);
+        setDetectedJob(null);
+    };
+
+    const handleDismissDetectedJob = () => {
+        // Clear detected job
+        saveDetectedJob(null);
+        setDetectedJob(null);
+    };
+
     const bgOverlay = theme === "darkmode"
         ? "bg-black/50"
         : "bg-black/30";
@@ -156,26 +224,32 @@ const Home = ({ theme }: SettingsProps) => {
     if (isLoading) return <div>Loading...</div>
     return (
         <>
-            <div className="p-3 flex flex-col gap-4 max-h-screen overflow-y-auto">
-                <Stats
-                    stats={stats}
-                    theme={theme}
-                />
-                <ApplicationsCard
-                    applications={applications}
-                    theme={theme}
-                    onDelete={deleteApplication}
-                    onStatusChange={updateStatus}
-                    onEdit={app => setIsEdit(app)}
-                />
-                <ManualEntry
-                    onOpen={() => setShowManualEntry(true)}
-                    onAdd={addApplication}
-                    theme={theme}
-                />
+            <div className="h-full flex flex-col p-4 gap-3">
+                <div className="shrink-0">
+                    <Stats
+                        stats={stats}
+                        theme={theme}
+                    />
+                </div>
+                <div className="flex-1 min-h-0">
+                    <ApplicationsCard
+                        applications={applications}
+                        theme={theme}
+                        onDelete={deleteApplication}
+                        onStatusChange={updateStatus}
+                        onEdit={app => setIsEdit(app)}
+                    />
+                </div>
+                <div className="shrink-0">
+                    <ManualEntry
+                        onOpen={() => setShowManualEntry(true)}
+                        onAdd={addApplication}
+                        theme={theme}
+                    />
+                </div>
             </div>
 
-            {/* Modal iverlay for edit form */}
+            {/* Modal overlay for edit form */}
             {isEdit && (
                 <div
                     className={`fixed inset-0 ${bgOverlay} flex items-center justify-center z-50 p-4`}
@@ -194,6 +268,24 @@ const Home = ({ theme }: SettingsProps) => {
                     </div>
                 </div>
             )}
+
+            {/* Show confirmation card if job detected */}
+            {detectedJob && (
+    <div
+        className={`fixed inset-0 ${bgOverlay} flex items-end justify-center z-50 p-4`}
+        onClick={handleDismissDetectedJob}
+    >
+        <div className="w-full" onClick={(e) => e.stopPropagation()}>
+            <PopUp
+                detectedJob={detectedJob}
+                theme={theme}
+                onConfirm={handleConfirmDetectedJob}
+                onEdit={handleEditDetectedJob}
+                onDismiss={handleDismissDetectedJob}
+            />
+        </div>
+    </div>
+)}
 
             {/* Modal Overlay for Manual Entry Form */}
             {showManualEntry && (

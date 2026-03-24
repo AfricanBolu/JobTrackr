@@ -1,19 +1,32 @@
 {
-	"manifest_version": 3,
-	"name": "Hello World",
-	"version": "1.0",
-	"description": "Hello World",
-	"action": {
-		"default_popup": "index.html",
-		"default_title": "Hello World"
-	},
-	"permissions": ["storage"],
-	"background": {
-		"service_worker": "background.js",
-		"type": "module"
-	},
-	"host_permissions": [
-		"https://script.google.com/*",
-		"https://script.googleusercontent.com/*"
-	]
+    "manifest_version": 3,
+    "name": "JobTrackr",
+    "version": "1.0",
+    "description": "Job Tracking Extension",
+    "action": {
+        "default_popup": "index.html",
+        "default_title": "Hello World"
+    },
+    "permissions": ["storage"],
+    "content_scripts": [
+        {
+            "matches": ["*://*.indeed.com/*", "*://*.google.com/*"],
+            "js": ["content.js"],
+            "run_at": "document_start"
+        }
+    ],
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "host_permissions": [
+        "https://script.google.com/*",
+        "https://script.googleusercontent.com/*"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": ["inject.js"],
+            "matches": ["*://*.indeed.com/*"]
+        }
+    ]
 }
