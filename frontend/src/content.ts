@@ -130,54 +130,115 @@ const url = new URL(window.location.href)
 //     // Initial attempt on page load
 //     scheduleCheck()
 // }
+function injectScript() {
+    if (document.querySelector('script[data-jobtrackr-inject]')) return
 
-if(url.hostname.includes('indeed.com')) {
-	// const id = ;
-	// console.log(id);
+    const script = document.createElement('script')
+    script.src = chrome.runtime.getURL('inject.js')
+    script.dataset.jobtrackrInject = 'true'
+    script.onload = () => script.remove()
+    ;(document.head || document.documentElement).appendChild(script)
+}
 
-	// console.log("Injecting interceptor from content script...")
+if (
+    document.querySelectorAll('script[type="application/ld+json"]').length > 0
+) {
+    console.log('Detected job posting schema - extracting job data')
+} else if (url.hostname.includes('glassdoor.com')) {
+    injectScript()
 
-	const script = document.createElement('script')
-	script.src = chrome.runtime.getURL('inject.js')
+    window.addEventListener('message', (event) => {
+        if (event.data?.source !== 'JOB_TRACKR_INJECT') return
 
-	script.onload = () => {
-		script.remove()
-	}
+        const { jobTitle, companyName, location, appliedFromUrl, jobId } =
+            event.data
 
-	(document.head || document.documentElement).appendChild(script)
-	
-	// let lastSeenJobId: string | null = null
-	window.addEventListener('message', (event) => {
-		if(event.data?.source !== 'JOB_TRACKR_INJECT') return;
+        setTimeout(() => {
+            let salary = ''
 
-		const {jobTitle, companyName, location, appliedFromUrl, jobId} = event.data
+            const salaryContainer = document.querySelector(
+                '#PaySection_salaryRange_F6fsy',
+            )
 
-		setTimeout(() => {
-			let salary = ''
+            if (salaryContainer) {
+                salary = salaryContainer.textContent?.trim() || ''
+            }
 
-			const salaryContainer = document.querySelector('#salaryInfoAndJobType > span.css-1oc7tea.eu4oa1w0')
+            // console.log('Received job data from inject script:', {
+            //     jobTitle,
+            //     companyName,
+            //     location,
+            //     appliedFromUrl,
+            //     jobId,
+            //     salary,
+            // })
 
-			if(salaryContainer) {
-				salary = salaryContainer.textContent?.trim().replace(/^From\s+/i, '') || ''
-			}
+            const application = {
+                id: crypto.randomUUID(),
+                jobTitle: jobTitle,
+                companyName: companyName,
+                location: location,
+                salary: salary,
+                appliedFromName: 'Glassdoor',
+                dateApplied: new Date().toISOString(),
+                jobStatus: 'applied',
+                syncStatus: 'pending',
+                appliedFromUrl: appliedFromUrl,
+                jobId: jobId,
+            }
 
-			const application = {
-				id: crypto.randomUUID(),
-				jobTitle: jobTitle,
-				companyName: companyName,
-				location: location,
-				salary: salary,
-				appliedFromName: 'Indeed',
-				dateApplied: new Date().toISOString(),
-				jobStatus: 'applied',
-				syncStatus: 'pending',
-				appliedFromUrl: appliedFromUrl,
-				jobId: jobId,
-			}
+            chrome.storage.local.set({ detectedJob: application }, () => {
+                console.log(
+                    'JobTrackr: Saved detected Glassdoor job:',
+                    application,
+                )
+            })
+        }, 300)
+    })
+} else if (url.hostname.includes('indeed.com')) {
+    injectScript()
 
-			chrome.storage.local.set({ detectedJob: application }, () => {
-				console.log('JobTrackr: Saved detected Indeed job:', application)
-			})
-		}, 300)
-	})	
+    // let lastSeenJobId: string | null = null
+    window.addEventListener('message', (event) => {
+        if (event.data?.source !== 'JOB_TRACKR_INJECT') return
+
+        const { jobTitle, companyName, location, appliedFromUrl, jobId } =
+            event.data
+
+        setTimeout(() => {
+            let salary = ''
+
+            const salaryContainer = document.querySelector(
+                '#salaryInfoAndJobType > span.css-1oc7tea.eu4oa1w0',
+            )
+
+            if (salaryContainer) {
+                salary =
+                    salaryContainer.textContent
+                        ?.trim()
+                        .replace(/^From\s+/i, '') || ''
+            }
+
+            const application = {
+                id: crypto.randomUUID(),
+                jobTitle: jobTitle,
+                companyName: companyName,
+                location: location,
+                salary: salary,
+                appliedFromName: 'Indeed',
+                dateApplied: new Date().toISOString(),
+                jobStatus: 'applied',
+                syncStatus: 'pending',
+                appliedFromUrl: appliedFromUrl,
+                jobId: jobId,
+            }
+
+            chrome.storage.local.set({ detectedJob: application }, () => {
+                console.log(
+                    'JobTrackr: Saved detected Indeed job:',
+                    application,
+                )
+            })
+        }, 300)
+    })
 }
