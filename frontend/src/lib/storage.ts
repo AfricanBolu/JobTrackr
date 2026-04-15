@@ -1,10 +1,10 @@
 /** @format */
 
-import type { Application, Theme } from "../types";
+import type { Application } from "../types";
 
 // ---- Keys (one place only) ----
 export const STORAGE_KEYS = {
-	theme: "theme",
+	// theme: "theme",
 	supportedSites: "supportedSites",
 	sheetUrl: "sheetUrl",
 	status: "status",
@@ -15,7 +15,7 @@ export const STORAGE_KEYS = {
 } as const;
 
 // ---- Defaults ----
-const DEFAULT_THEME: Theme = "lightmode";
+// const DEFAULT_THEME: Theme = "lightmode";
 const DEFAULT_SITES: string[] = [
 	"linkedin.com",
 	"indeed.com",
@@ -77,11 +77,11 @@ function setLocal(key: string, value: unknown): Promise<void> {
 }
 
 // ---- Type guards ----
-function isTheme(v: unknown): v is Theme {
-	// considers v as THEME type
-	// checks if v is lightmode or darkmode
-	return v === "lightmode" || v === "darkmode";
-}
+// function isTheme(v: unknown): v is Theme {
+// 	// considers v as THEME type
+// 	// checks if v is lightmode or darkmode
+// 	return v === "lightmode" || v === "darkmode";
+// }
 
 function isStringArray(v: unknown): v is string[] {
 	// makees the v a string array
@@ -112,18 +112,18 @@ function isADetectedJob(v: unknown): v is Application | null {
 }
 
 // ---- Public API: Preferences (sync) ----
-export async function loadTheme(): Promise<Theme> {
-	// loads theme from chrome storage
-	// check if theme is valid
-	// if not, return default
-	const v = await getSync<unknown>(STORAGE_KEYS.theme);
-	return isTheme(v) ? v : DEFAULT_THEME;
-}
+// export async function loadTheme(): Promise<Theme> {
+// 	// loads theme from chrome storage
+// 	// check if theme is valid
+// 	// if not, return default
+// 	const v = await getSync<unknown>(STORAGE_KEYS.theme);
+// 	return isTheme(v) ? v : DEFAULT_THEME;
+// }
 
-export async function saveTheme(theme: Theme): Promise<void> {
-	// saves theme to chrome storage
-	await setSync(STORAGE_KEYS.theme, theme);
-}
+// export async function saveTheme(theme: Theme): Promise<void> {
+// 	// saves theme to chrome storage
+// 	await setSync(STORAGE_KEYS.theme, theme);
+// }
 
 export async function loadSupportedSites(): Promise<string[]> {
 	// loads supported sites from chrome storage

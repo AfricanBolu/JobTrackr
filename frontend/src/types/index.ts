@@ -1,9 +1,9 @@
 /** @format */
-export type Theme = "lightmode" | "darkmode";
+// export type Theme = "lightmode" | "darkmode";
 
-export interface ThemeProps {
-	theme: Theme;
-}
+// export interface ThemeProps {
+// 	theme: Theme;
+// }
 export type ApplicationStatus = "applied" | "interview" | "offer" | "rejected";
 export type SyncStatus = "synced" | "pending" | "failed"; // sync status
 export type AppliedFrom =
@@ -42,13 +42,13 @@ export type StatsData = {
 	interviews: number;
 };
 
-export interface SettingsProps extends ThemeProps {
-	changeTheme: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+// export interface SettingsProps extends ThemeProps {
+// 	changeTheme: (e: React.ChangeEvent<HTMLInputElement>) => void;
+// }
 
 export type ApplicationsProps = {
 	applications: Application[];
-	theme: Theme;
+	// theme: Theme;
 	onDelete: (id: string) => void;
 	onStatusChange: (id: string, status: ApplicationStatus) => void;
 	onEdit: (app: Application) => void;
@@ -57,14 +57,14 @@ export type ApplicationsProps = {
 export type ManualEntryProps = {
 	onOpen: () => void;
 	onAdd: (application: Application) => void;
-	theme: Theme;
+	// theme: Theme;
 };
 
 export type FormProps = {
 	mode: "edit" | "create";
 	initialValues?: Application;
 	onSubmit: (application: Application) => void;
-	theme: Theme;
+	// theme: Theme;
 	onClose: () => void;
 };
 
@@ -75,12 +75,12 @@ export type DataProps = {
 export type NavProps = {
 	settingsClick: () => void;
 	showSettings: boolean;
-	theme: Theme;
+	// theme: Theme;
 };
 
 export interface PopupProps {
 	detectedJob: Application | null;
-	theme: Theme;
+	// theme: Theme;
 	onConfirm: () => void;
 	onEdit: () => void;
 	onDismiss: () => void;
