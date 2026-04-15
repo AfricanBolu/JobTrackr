@@ -11,7 +11,6 @@ A Chrome extension that automatically detects jobs you view on Indeed, lets you 
 - **Google Sheets sync** — Applications sync to your own Google Sheet via a Google Apps Script backend
 - **Manual entry** — Add applications from any site manually through the popup form
 - **Status tracking** — Track each application through stages: Applied, Interview, Offer, Rejected
-- **Dark/Light mode** — Theme persists across sessions
 - **Offline-first** — All data is stored locally in `chrome.storage.local` first, then synced
 
 ---
@@ -73,23 +72,35 @@ npm run build
 ```
 frontend/
 ├── src/
+│   ├── App.tsx
 │   ├── content.ts          # Content script — bridges inject.js and chrome storage
 │   ├── inject.ts           # Page script — intercepts Indeed fetch calls
 │   ├── background.ts       # Service worker — handles Google Sheets sync messages
 │   ├── lib/
 │   │   ├── storage.ts      # Chrome storage read/write abstraction
-│   │   └── schema.ts       # Application → Sheets row mapping
+│   │   ├── schema.ts       # Application → Sheets row mapping
+|   |   └── script.ts       # Make the websites easier to add for auto detection
 │   ├── components/
-│   │   ├── Home/
-│   │   │   ├── PopUp.tsx         # Detected job confirmation card
-│   │   │   ├── ApplicationsCard.tsx
-│   │   │   ├── Form.tsx
-│   │   │   ├── ManualEntry.tsx
-│   │   │   └── Stats.tsx
-│   │   └── Settings/
-│   └── types.ts
-├── vite.config.ts
-└── manifest.json
+│   │   ├── Body/
+│   │   │   ├── Home/
+|   │   │   │   ├── PopUp.tsx         # Detected job confirmation card
+|   |   │   │   ├── ApplicationsCard.tsx
+│   │   │   |   ├── Form.tsx
+│   │   │   |   ├── ManualEntry.tsx
+│   │   │   |   └── Stats.tsx
+|   |   |   └── Home.tsx
+│   │   └── Header/
+│   │   │   ├── Settings/
+|   |   │   │   ├── Data.tsx
+│   │   │   |   ├── Settings.tsx
+│   │   │   |   ├── SiteSettings.tsx
+│   │   │   └── Nav.tsx
+│   ├── types/
+|   |   └── index.ts
+├── public/
+|   └── manifest.json
+|   ...
+└── vite.config.ts
 ```
 
 ---
@@ -110,8 +121,9 @@ frontend/
 |------|---------------|--------------|
 | Indeed | ✅ | ✅ |
 | LinkedIn | 🚧 In progress | ✅ |
-| Glassdoor | 🔜 Planned | ✅ |
-| Handshake | 🔜 Planned | ✅ |
+| Glassdoor | ✅ | ✅ |
+| Handshake | ✅ | ✅ |
+| Other Websites | ✅ | ✅ |
 
 ---
 
