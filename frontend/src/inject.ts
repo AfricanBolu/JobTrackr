@@ -113,4 +113,29 @@ if (hostname.includes('indeed.com')) {
     }
 
     console.log('Fetch interceptor installed')
+} else if (hostname.includes('linkedin.com')) {
+    console.log('LinkedIn detected - injecting script')
+    const ogFetch = window.fetch
+    // const lastSeenJobId: string | null = null
+
+    window.fetch = async function (...args) {
+        // console.log('fetch request intercepted', args[0])
+        const response = await ogFetch(...args)
+        const url = args[0]
+        console.log('fetch request intercepted', url);
+
+        if (
+            typeof url === 'string' &&
+            url.includes('/voyager/api/jobs/jobPostings/')
+        ) {
+            console.log('fetch request intercepted', url)
+            const clone = response.clone()
+            const data = await clone
+            // console.log('html', await data.text())
+            const res = await data.json()
+            console.log(res)
+        }
+
+        return response
+    }
 }
