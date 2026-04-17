@@ -1,48 +1,43 @@
-import { useRef, useState } from 'react'
-import type { Application, FormProps, AppliedFrom } from '../../../types'
-import { nanoid } from 'nanoid'
+import { useRef, useState } from "react"
+import type { Application, FormProps, AppliedFrom } from "../../../types"
+import { nanoid } from "nanoid"
 
-const Form = ({ mode, initialValues, onSubmit, onClose }: FormProps) => {
-    const submitButton = 'bg-white hover:bg-gray-300 text-slate-700'
+const Form = ({ mode, initialValues, onSubmit, theme, onClose }: FormProps) => {
+    const submitButton = theme === "darkmode"
+        ? "bg-white hover:bg-gray-300 text-slate-700"
+        : "bg-gray-300 hover:bg-white text-slate-700";
 
-    const container = 'bg-slate-800 border-slate-700 text-slate-100'
+    const container = theme === "darkmode"
+        ? "bg-slate-800 border-slate-700 text-slate-100"
+        : "bg-white border-gray-200 text-slate-800"
 
-    const input = 'bg-slate-900 border-slate-700 text-slate-100'
+    const input = theme === "darkmode"
+        ? "bg-slate-900 border-slate-700 text-slate-100"
+        : "bg-gray-50 border-gray-300 text-slate-800"
 
     // const fileTheme = theme === "darkmode"
     //     ? "bg-slate-900 border-slate-700 hover:bg-gray-500"
     //     : "bg-gray-50 border-gray-300 hover:bg-gray-100"
 
-    const [companyName, setCompanyName] = useState(
-        initialValues?.companyName ?? '',
-    )
-    const [jobTitle, setJobTitle] = useState(initialValues?.jobTitle ?? '')
+    const [companyName, setCompanyName] = useState(initialValues?.companyName ?? "")
+    const [jobTitle, setJobTitle] = useState(initialValues?.jobTitle ?? "")
     // const [dateApplied, setDateApplied] = useState("")
-    const [status, setStatus] = useState<Application['jobStatus'] | ''>(
-        initialValues?.jobStatus ?? '',
-    )
-    const [websiteUrl, setWebsiteUrl] = useState(
-        initialValues?.appliedFromUrl ?? '',
-    )
-    const [websiteName, setWebsiteName] = useState<AppliedFrom | ''>(
-        initialValues?.appliedFromName ?? '',
-    )
-    const [resumeUsed, setResumeUsed] = useState(initialValues?.resumeRef ?? '')
-    const [jobLocation, setJobLocation] = useState(
-        initialValues?.location ?? '',
-    )
-    const [fileName, setFileName] = useState(initialValues?.resumeRef ?? '')
+    const [status, setStatus] = useState<Application["jobStatus"] | "">(initialValues?.jobStatus ?? "")
+    const [websiteUrl, setWebsiteUrl] = useState(initialValues?.appliedFromUrl ?? "")
+    const [websiteName, setWebsiteName] = useState<AppliedFrom | "">(initialValues?.appliedFromName ?? "")
+    const [resumeUsed, setResumeUsed] = useState(initialValues?.resumeRef ?? "")
+    const [jobLocation, setJobLocation] = useState(initialValues?.location ?? "")
+    const [fileName, setFileName] = useState(initialValues?.resumeRef ?? "")
 
-    const fileRef = useRef<HTMLInputElement>(null)
+    const fileRef = useRef<HTMLInputElement>(null);
+
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
+        e.preventDefault();
 
         if (!companyName || !jobTitle || !websiteUrl) {
-            alert(
-                'Please fill in required fields: Company Name, Job Title, Website Name, and URL',
-            )
-            return
+            alert("Please fill in required fields: Company Name, Job Title, Website Name, and URL");
+            return;
         }
 
         const updated: Application = {
@@ -53,9 +48,9 @@ const Form = ({ mode, initialValues, onSubmit, onClose }: FormProps) => {
             // Updated fields from form
             companyName,
             jobTitle,
-            jobStatus: status || 'applied',
+            jobStatus: status || "applied",
             appliedFromUrl: websiteUrl,
-            appliedFromName: websiteName as Application['appliedFromName'],
+            appliedFromName: websiteName as Application["appliedFromName"],
             resumeRef: resumeUsed,
             location: jobLocation || undefined,
 
@@ -67,29 +62,69 @@ const Form = ({ mode, initialValues, onSubmit, onClose }: FormProps) => {
             jobDescription: initialValues?.jobDescription,
 
             // Sync status
-            syncStatus:
-                mode === 'edit'
-                    ? (initialValues?.syncStatus ?? 'pending')
-                    : 'pending',
+            syncStatus: mode === "edit" ? initialValues?.syncStatus ?? "pending" : "pending",
             updatedAt: new Date().toISOString(),
             lastSyncError: undefined,
-        }
+        };
+        // const base: Partial<Application> =
+        //     mode === "edit" && initialValues
+        //         ? {
+        //             ...initialValues
+        //         }
+        //         : {
+        //             id: nanoid(),
+        //             dateApplied: new Date().toISOString(),
+        //             // jobTitle: "",
+        //             // jobStatus: "applied",
+        //             // appliedFromName: "",
+        //             // appliedFromUrl: "",
+        //             // companyName: "",
+        //             // jobUrl: "",
+        //             // jobId: "",
+        //             // notes: "",
+        //             // salary: "",
+        //             // jobDescription: "",
+        //         };
 
-        onSubmit(updated)
-        onClose()
-    }
+        // const updated: Application = {
+        //     // required fields (ensure these exist)
+        //     id: base.id!,
+        //     dateApplied: base.dateApplied!,
+        //     companyName: companyName || base.companyName!,
+        //     jobTitle: jobTitle || base.jobTitle!,
+        //     jobStatus: status || base.jobStatus!,
+        //     appliedFromUrl: websiteUrl || base.appliedFromUrl!,
+        //     appliedFromName: websiteName as Application["appliedFromName"] || base.appliedFromName!,
+        //     resumeRef: resumeUsed || "",
+        //     syncStatus: "pending",
+
+        //     // keep optional fields from edit (if any)
+        //     jobUrl: base.jobUrl,
+        //     jobId: base.jobId,
+        //     notes: base.notes,
+        //     salary: base.salary,
+        //     jobDescription: base.jobDescription,
+        //     location: jobLocation || base.location,
+        //     updatedAt: new Date().toISOString(),
+        //     lastSyncError: undefined,
+        // };
+
+        onSubmit(updated);
+        onClose();
+    };
+
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
+        const file = e.target.files?.[0];
         if (file) {
             setFileName(file.name)
-            setResumeUsed(file.name)
+            setResumeUsed(file.name);
         }
-    }
+    };
 
     const handleAddFile = () => {
         if (fileRef.current) {
-            fileRef.current.click()
+            fileRef.current.click();
         }
     }
 
@@ -98,9 +133,13 @@ const Form = ({ mode, initialValues, onSubmit, onClose }: FormProps) => {
             onSubmit={handleSubmit}
             className={`p-4 rounded-xl border max-h-[80vh] overflow-y-auto ${container}`}
         >
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">
-                    {mode === 'edit' ? 'Edit Application' : 'Manual Entry'}
+            <div
+                className="flex justify-between items-center mb-4"
+            >
+                <h3
+                    className="text-xl font-semibold"
+                >
+                    {mode === "edit" ? "Edit Application" : "Manual Entry"}
                 </h3>
                 <button
                     onClick={onClose}
@@ -111,37 +150,44 @@ const Form = ({ mode, initialValues, onSubmit, onClose }: FormProps) => {
                 </button>
             </div>
 
-            {/* grid form layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            { /* grid form layout */}
+            <div
+                className="grid grid-cols-1 md:grid-cols-2 gap-3"
+            >
                 <input
                     className={`px-3 py-2 rounded border ${input}`}
                     type="text"
                     placeholder="Company name *"
                     value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
+                    onChange={
+                        (e) => setCompanyName(e.target.value)
+                    }
                 />
                 <input
                     className={`px-3 py-2 rounded border ${input}`}
                     type="text"
                     placeholder="Job title *"
                     value={jobTitle}
-                    onChange={(e) => setJobTitle(e.target.value)}
+                    onChange={
+                        (e) => setJobTitle(e.target.value)
+                    }
                 />
                 <input
                     className={`px-3 py-2 rounded border ${input}`}
                     type="text"
                     placeholder="Job location"
                     value={jobLocation}
-                    onChange={(e) => setJobLocation(e.target.value)}
+                    onChange={
+                        (e) => setJobLocation(e.target.value)
+                    }
                 />
                 <select
                     className={`px-3 py-2 rounded border ${input}`}
                     title="Select status of job application"
                     value={status}
-                    onChange={(e) =>
-                        setStatus(e.target.value as Application['jobStatus'])
-                    }
-                >
+                    onChange={
+                        (e) => setStatus(e.target.value as Application["jobStatus"])
+                    }>
                     <option value="">Select Status</option>
                     <option value="applied">Applied</option>
                     <option value="interview">Interview</option>
@@ -151,9 +197,7 @@ const Form = ({ mode, initialValues, onSubmit, onClose }: FormProps) => {
                 <select
                     className={`px-3 py-2 rounded border ${input}`}
                     value={websiteName}
-                    onChange={(e) =>
-                        setWebsiteName(e.target.value as AppliedFrom)
-                    }
+                    onChange={(e) => setWebsiteName(e.target.value as AppliedFrom)}
                     title="Select website applied on"
                 >
                     <option value="">Select Website</option>
@@ -169,10 +213,14 @@ const Form = ({ mode, initialValues, onSubmit, onClose }: FormProps) => {
                     type="url"
                     placeholder="wesite applied on *"
                     value={websiteUrl}
-                    onChange={(e) => setWebsiteUrl(e.target.value)}
+                    onChange={
+                        (e) => setWebsiteUrl(e.target.value)
+                    }
                 />
                 {/* file upload */}
-                <div className="md:col-span-2 flex items-center gap-3">
+                <div
+                    className="md:col-span-2 flex items-center gap-3"
+                >
                     <input
                         placeholder="resume"
                         ref={fileRef}
@@ -186,12 +234,11 @@ const Form = ({ mode, initialValues, onSubmit, onClose }: FormProps) => {
                         className={`px-4 py-2 rounded-lg font-medium ${submitButton}`}
                         onClick={handleAddFile}
                     >
-                        Choose Resume
-                    </button>
+                        Choose Resume</button>
                     <span
                         className={`text-sm truncate max-w-50 ${fileName ? '' : 'text-gray-400'}`}
                     >
-                        {fileName || 'No file selected'}
+                        {fileName || "No file selected"}
                     </span>
                 </div>
             </div>
@@ -199,7 +246,7 @@ const Form = ({ mode, initialValues, onSubmit, onClose }: FormProps) => {
                 type="submit"
                 className={`w-full mt-4 px-4 py-2 rounded-lg font-medium ${submitButton}`}
             >
-                {mode === 'edit' ? 'Update Application' : 'Add Application'}
+                {mode === "edit" ? "Update Application" : "Add Application"}
             </button>
         </form>
     )

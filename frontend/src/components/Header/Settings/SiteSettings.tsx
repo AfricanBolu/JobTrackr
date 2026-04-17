@@ -1,6 +1,6 @@
 import { loadSupportedSites, saveSupportedSites } from '../../../lib/storage'
 import { syncContentScripts } from '../../../lib/scripts'
-// import type { ThemeProps } from '../../../types'
+import type { ThemeProps } from '../../../types'
 import { useEffect, useState } from 'react'
 
 const DefaultSites = [
@@ -10,7 +10,7 @@ const DefaultSites = [
     'handshake.com',
 ]
 
-const SiteSettings = () => {
+const SiteSettings = ({ theme }: ThemeProps) => {
     const [site, setSite] = useState<string[]>(DefaultSites)
     const [newSite, setNewSite] = useState('')
     const [isInitiated, setIsInitiated] = useState(false)
@@ -67,16 +67,28 @@ const SiteSettings = () => {
     }
 
     // change container color based on theme
-    const containerColor = 'bg-slate-800 border-slate-700'
+    const containerColor =
+        theme === 'darkmode'
+            ? 'bg-slate-800 border-slate-700'
+            : 'bg-white border-gray-200 shadow-sm'
 
     // change input color based on theme
-    const inputColor = 'border-stone-600 bg-slate-800 text-stone-200'
+    const inputColor =
+        theme === 'darkmode'
+            ? 'border-stone-600 bg-slate-800 text-stone-200'
+            : 'border-stone-400 bg-white text-black'
 
     // change sites color based on theme
-    const sitesColor = 'bg-slate-900 border-slate-700'
+    const sitesColor =
+        theme === 'darkmode'
+            ? 'bg-slate-900 border-slate-700'
+            : 'bg-white border-gray-300 text-slate-900'
 
     // change button color based on theme
-    const buttonTheme = 'bg-blue-600 hover:bg-blue-700 text-white'
+    const buttonTheme =
+        theme === 'darkmode'
+            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+            : 'bg-blue-600 hover:bg-blue-700 text-white'
 
     return (
         <div className={`p-3 rounded-xl border ${containerColor}`}>
